@@ -3,85 +3,99 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0C6B4E">
+<meta name="theme-color" content="#fafafa">
 <meta name="description" content="Personal peso budget: salary, bills, daily expenses and savings goals.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💸</text></svg>">
 <title>Gastador</title>
 <script>try { const t = localStorage.getItem('gastador.theme'); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
 <style>
+/* Akashi design system — values from ~/personal/viz/packages/design-system, inlined since this page has no build step */
 :root{
   color-scheme:light;
-  --bg:#EEF2EC; --surface:#FBFCF9; --ink:#15201B; --muted:#5B6961; --line:#D5DDD4;
-  --accent:#0C6B4E; --accent-ink:#FFFFFF; --accent-soft:#D7E9DF;
-  --bills:#4A6FA5; --save:#0C6B4E; --spent:#C9822B; --left:#C9D8CD;
-  --warn:#9A5F0C; --warn-soft:#F6E7CC; --bad:#B42318; --bad-soft:#F7DCD8;
-  --display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
-  --body:"Instrument Sans","Helvetica Neue",Arial,system-ui,sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --paper:#fafafa; --surface:#ffffff; --ink:#191919; --muted:#6d6d6d; --line:#dedede; --lead:#4c4c4c; --quiet:#666666;
+  --mention:#ededed; --hover:#efefef; --on-primary:#ffffff;
+  --primary:linear-gradient(#292929,#141414); --primary-hover:linear-gradient(#3b3b3b,#252525);
+  --shadow-float:0 1px 2px #00000005,0 9px 14px -11px #0000002e,0 28px 45px -28px #00000038,0 56px 84px -53px #0000003d;
+  /* data is monochrome steps; red is kept only for over budget, negative and delete */
+  --bills:#191919; --save:#555555; --spent:#8f8f8f; --left:#e4e4e4; --bad:#b42318; --bad-soft:#f7dcd8;
+  --display:"Zen Kaku Gothic New",sans-serif;
+  --body:"Manrope",system-ui,sans-serif;
+  --mono:"DM Mono",ui-monospace,monospace;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     color-scheme:dark;
-    --bg:#0F1513; --surface:#161E1B; --ink:#E3EAE5; --muted:#93A39A; --line:#2A3631;
-    --accent:#4CC093; --accent-ink:#08130E; --accent-soft:#1B3A2E;
-    --bills:#7C9FD6; --save:#4CC093; --spent:#E3A04F; --left:#2E3D36;
-    --warn:#E6B460; --warn-soft:#3A2E17; --bad:#F0776B; --bad-soft:#3E1D1A;
+    --paper:#111111; --surface:#1a1a1a; --ink:#ededed; --muted:#9a9a9a; --line:#2e2e2e; --lead:#c4c4c4; --quiet:#a0a0a0;
+    --mention:#2a2a2a; --hover:#242424; --on-primary:#141414;
+    --primary:linear-gradient(#f2f2f2,#d9d9d9); --primary-hover:linear-gradient(#ffffff,#e6e6e6);
+    --shadow-float:0 1px 2px #0000004d,0 20px 40px -24px #000000b3;
+    --bills:#ededed; --save:#a8a8a8; --spent:#737373; --left:#2a2a2a; --bad:#f0776b; --bad-soft:#3e1d1a;
   }
 }
 :root[data-theme="dark"]{
   color-scheme:dark;
-  --bg:#0F1513; --surface:#161E1B; --ink:#E3EAE5; --muted:#93A39A; --line:#2A3631;
-  --accent:#4CC093; --accent-ink:#08130E; --accent-soft:#1B3A2E;
-  --bills:#7C9FD6; --save:#4CC093; --spent:#E3A04F; --left:#2E3D36;
-  --warn:#E6B460; --warn-soft:#3A2E17; --bad:#F0776B; --bad-soft:#3E1D1A;
+  --paper:#111111; --surface:#1a1a1a; --ink:#ededed; --muted:#9a9a9a; --line:#2e2e2e; --lead:#c4c4c4; --quiet:#a0a0a0;
+  --mention:#2a2a2a; --hover:#242424; --on-primary:#141414;
+  --primary:linear-gradient(#f2f2f2,#d9d9d9); --primary-hover:linear-gradient(#ffffff,#e6e6e6);
+  --shadow-float:0 1px 2px #0000004d,0 20px 40px -24px #000000b3;
+  --bills:#ededed; --save:#a8a8a8; --spent:#737373; --left:#2a2a2a; --bad:#f0776b; --bad-soft:#3e1d1a;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--body);padding-inline:16px;padding-block:0 48px}
+html{font-synthesis:none;-webkit-font-smoothing:antialiased;text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 15px/1.6 var(--body);padding-inline:max(25px,4.25vw);padding-block:0 48px}
 .foot a,.foot button.link{color:inherit;background:none;border:0;padding:0;text-decoration:underline;cursor:pointer;font-size:inherit}
-.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
-h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
-h2{font-size:1.2rem;font-weight:700}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+h1,h2,h3{font-family:var(--display);font-weight:500;margin:0;text-wrap:balance;letter-spacing:-.025em}
+h2{font-size:1.35rem;line-height:1.22}
 .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .muted{color:var(--muted)}
 .label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
 button,input,select{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+:focus-visible{outline:2px solid var(--ink);outline-offset:5px}
+input:focus-visible,select:focus-visible{outline-offset:2px}
+
+/* buttons */
+.go,.add button,.btn{background:var(--primary);color:var(--on-primary);border:0;border-radius:13px;padding:0 20px;min-height:40px;font-weight:500;cursor:pointer;transition:scale 180ms}
+.go:hover,.add button:hover,.btn:hover{background:var(--primary-hover)}
+.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:13px;padding:0 20px;min-height:40px;font-weight:500;cursor:pointer;transition:background-color 180ms,scale 180ms}
+.ghost:hover{background:var(--hover)}
+.go:active,.add button:active,.btn:active,.ghost:active,.icon:active{scale:.97}
 
 /* top bar */
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px;border-bottom:1px solid var(--line)}
-.brand{font-family:var(--display);font-weight:800;font-size:1.35rem;letter-spacing:-.03em}
-.brand span{color:var(--accent)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px;border-bottom:1px solid var(--line)}
+.brand{font:700 clamp(26px,2.6vw,32px)/1 var(--display);letter-spacing:-.03em}
+.brand span{font-weight:400;color:var(--quiet)}
 .month{display:flex;align-items:center;gap:4px}
-.month strong{min-width:9.5ch;text-align:center;font-family:var(--display);font-weight:700}
-.icon{border:1px solid var(--line);background:var(--surface);border-radius:8px;width:34px;height:34px;cursor:pointer;display:grid;place-items:center}
-.icon:hover{border-color:var(--accent)}
+.month strong{min-width:9.5ch;white-space:nowrap;text-align:center;font-family:var(--display);font-weight:500}
+.icon{border:1px solid var(--line);background:var(--surface);border-radius:50%;width:40px;height:40px;cursor:pointer;display:grid;place-items:center;transition:background-color 180ms,scale 180ms}
+.icon:hover{background:var(--hover)}
 
 /* hero */
-.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:end;padding-block:12px 4px}
-.big{font-family:var(--display);font-weight:800;font-size:clamp(2.6rem,7vw,4.6rem);line-height:.95;letter-spacing:-.04em}
+.hero{display:grid;grid-template-columns:1fr 1.07fr;gap:4vw;align-items:end;padding-block:16px 4px}
+.big{font-family:var(--display);font-weight:500;font-size:clamp(48px,6.7vw,96px);line-height:1.05;letter-spacing:-.035em}
 .big.neg{color:var(--bad)}
-.perday{margin-top:10px;font-size:1.05rem}
-.perday b{font-family:var(--mono);font-weight:500;background:var(--accent-soft);color:var(--ink);padding:1px 7px;border-radius:6px}
+.perday{margin-top:12px;font-size:clamp(17px,1.45vw,23px);line-height:1.45;letter-spacing:-.02em;color:var(--lead)}
+.perday b{font-family:var(--mono);font-weight:500;background:var(--mention);color:var(--ink);padding:1px 6px;border-radius:5px}
 .split{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--left);gap:2px}
 .split i{display:block;height:100%}
 .legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 20px;margin-top:12px}
 .legend div{display:flex;justify-content:space-between;gap:8px;font-size:.9rem;border-top:1px solid var(--line);padding-top:6px}
-.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px;vertical-align:baseline}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:baseline}
 
-/* quick add */
-.quick{background:var(--accent);color:var(--accent-ink);border-radius:14px;padding:14px;display:grid;grid-template-columns:1.1fr 1.2fr 1fr 2fr auto;gap:8px;align-items:end}
-.quick label{display:flex;flex-direction:column;gap:3px;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
-.quick input,.quick select{background:var(--surface);color:var(--ink);border:0;border-radius:8px;padding:9px 10px;width:100%;min-width:0}
-.quick .go{background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:9px 16px;font-weight:600;cursor:pointer;height:40px}
+/* quick add: the primary task, so the one floating card */
+.quick{background:var(--surface);border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow-float);padding:clamp(16px,2vw,24px);display:grid;grid-template-columns:1.1fr 1.2fr 1fr 2fr auto;gap:10px;align-items:end}
+.quick label{display:flex;flex-direction:column;gap:4px;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--muted)}
+.quick input,.quick select{font:400 1rem var(--body);letter-spacing:normal;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:13px;padding:0 12px;height:46px;width:100%;min-width:0}
+.quick .go{min-height:46px;padding:0 23px}
 
 /* panels */
-.grid{display:grid;grid-template-columns:1.35fr 1fr;gap:20px;align-items:start}
-.col{display:flex;flex-direction:column;gap:20px;min-width:0}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.grid{display:grid;grid-template-columns:1.35fr 1fr;gap:24px;align-items:start}
+.col{display:flex;flex-direction:column;gap:24px;min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:17px;padding:clamp(18px,2vw,26px);display:flex;flex-direction:column;gap:14px;min-width:0}
 .panel header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
 .chart{overflow-x:auto}
 .chart svg{display:block;width:100%;height:auto;min-width:420px}
@@ -90,26 +104,26 @@ button,input,select{font:inherit;color:inherit}
 .row:first-child{border-top:0}
 .row .t{min-width:0;overflow-wrap:anywhere}
 .row .sub{font-size:.8rem;color:var(--muted)}
-.del{background:none;border:0;color:var(--muted);cursor:pointer;padding:4px 6px;border-radius:6px;font-size:1rem;line-height:1}
+.del{background:none;border:0;color:var(--muted);cursor:pointer;padding:4px 6px;border-radius:50%;font-size:1rem;line-height:1}
 .del:hover{color:var(--bad);background:var(--bad-soft)}
 .day + .row{border-top:0}
 .chart text{font:11px var(--mono);fill:var(--muted)}
 .day{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;display:flex;justify-content:space-between;padding:12px 0 2px}
-.chip{font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap}
-.chip.due{background:var(--warn-soft);color:var(--warn)}
-.chip.late{background:var(--bad-soft);color:var(--bad)}
-.chip.paid{background:var(--accent-soft);color:var(--accent)}
+/* status reads by text + shape, not hue: due = outline, late = solid, paid = soft */
+.chip{font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:5px;white-space:nowrap;border:1px solid transparent}
+.chip.due{border-color:var(--ink);color:var(--ink)}
+.chip.late{background:var(--ink);color:var(--paper)}
+.chip.paid{background:var(--mention);color:var(--muted)}
 .check{display:flex;align-items:center;gap:10px;cursor:pointer}
-.check input{width:18px;height:18px;accent-color:var(--accent)}
+.check input{width:18px;height:18px;accent-color:var(--ink)}
 .row.done .t{text-decoration:line-through;color:var(--muted)}
 .add{display:flex;gap:6px;flex-wrap:wrap}
-.add input{flex:1 1 90px;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px}
-.add button,.btn{background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:7px 14px;font-weight:600;cursor:pointer}
+.add input,.goal .dep input{flex:1 1 90px;min-width:0;background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:0 11px;height:40px}
 .tpl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.tpl button{border:1px dashed var(--line);background:none;border-radius:99px;padding:3px 10px;font-size:.8rem;cursor:pointer;color:var(--muted)}
-.tpl button:hover{border-color:var(--accent);color:var(--accent)}
+.tpl button{border:1px dashed var(--line);background:none;border-radius:99px;padding:3px 10px;font-size:.8rem;cursor:pointer;color:var(--muted);transition:background-color 180ms}
+.tpl button:hover{border-color:var(--ink);color:var(--ink);background:var(--hover)}
 .cat{display:grid;grid-template-columns:8.5rem 1fr auto;gap:10px;align-items:center;font-size:.9rem}
-.bar{height:8px;border-radius:4px;background:var(--bg);overflow:hidden}
+.bar{height:8px;border-radius:4px;background:var(--mention);overflow:hidden}
 .bar i{display:block;height:100%;background:var(--spent);border-radius:4px}
 .goal{display:flex;flex-direction:column;gap:8px;padding:12px 0;border-top:1px solid var(--line)}
 .goal:first-child{border-top:0;padding-top:0}
@@ -118,20 +132,41 @@ button,input,select{font:inherit;color:inherit}
 .goal .bar i{background:var(--save)}
 .goal .meta{display:flex;justify-content:space-between;gap:10px;font-size:.82rem;color:var(--muted);flex-wrap:wrap}
 .goal .dep{display:flex;gap:6px}
-.goal .dep input{width:9rem;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;min-width:0}
-.banner{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 14px;font-size:.9rem}
-.banner .btn{background:var(--warn);color:var(--surface)}
+.goal .dep input{flex:0 1 9rem}
+.banner{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:var(--mention);color:var(--ink);border-radius:13px;padding:10px 14px;font-size:.9rem}
 .empty{color:var(--muted);font-size:.9rem;padding:6px 0}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:.9rem}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:13px;font-size:.9rem}
 .foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* dialog + segmented control */
+dialog{width:min(520px,calc(100vw - 32px));max-height:calc(100dvh - 48px);padding:0;border:1px solid var(--line);border-radius:20px;background:var(--surface);color:var(--ink);box-shadow:var(--shadow-float)}
+dialog[open]{animation:dlg-in 220ms cubic-bezier(.215,.61,.355,1)}
+@keyframes dlg-in{from{opacity:0;translate:0 10px;scale:.99}}
+dialog::backdrop{background:#fafafaab;backdrop-filter:blur(10px)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) dialog::backdrop{background:#111111ab} }
+:root[data-theme="dark"] dialog::backdrop{background:#111111ab}
+dialog form{padding:28px;display:flex;flex-direction:column;gap:18px}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+legend{padding:0;margin-bottom:8px}
+fieldset:disabled{opacity:.45}
+.seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:4px;padding:4px;background:var(--paper);border:1px solid var(--line);border-radius:13px}
+.seg label{position:relative;display:grid;place-items:center;text-align:center;padding:9px 10px;border-radius:9px;font-weight:500;font-size:.9rem;cursor:pointer;transition:background-color 180ms}
+.seg label:hover{background:var(--hover)}
+.seg input{position:absolute;inset:0;margin:0;opacity:0;cursor:inherit}
+.seg label:has(:checked){background:var(--surface);box-shadow:0 1px 2px #0000001f,0 0 0 1px var(--line)}
+.seg label:has(:focus-visible){outline:2px solid var(--ink);outline-offset:2px}
+.seg small{display:block;font-size:.75rem;font-weight:400;color:var(--muted)}
+fieldset:disabled .seg label{cursor:not-allowed;background:none}
+.actions{display:flex;justify-content:flex-end;gap:8px}
 
 @media (max-width:860px){
   .hero,.grid{grid-template-columns:1fr}
   .quick{grid-template-columns:1fr 1fr}
   .quick .note,.quick .go{grid-column:1/-1}
 }
-@media (max-width:420px){ .cat{grid-template-columns:6rem 1fr auto} .legend{grid-template-columns:1fr} }
+@media (max-width:420px){ .cat{grid-template-columns:6rem 1fr auto} .legend{grid-template-columns:1fr} .month strong{min-width:0} .icon{width:36px;height:36px} }
+@media (prefers-reduced-motion:reduce){ *{transition:none!important} }
 </style>
 
 <div class="wrap">
@@ -222,10 +257,31 @@ button,input,select{font:inherit;color:inherit}
   </div>
 
   <div class="foot">
-    <span><span id="syncNote">Saved in this browser</span> · <button class="link" id="exportBtn" type="button">Export backup</button> · <label class="link" style="text-decoration:underline;cursor:pointer">Import backup<input id="importFile" type="file" accept="application/json,.json" hidden></label></span>
+    <span><span id="syncNote">Saved in this browser</span> · <button class="link" id="exportBtn" type="button">Export…</button> · <label class="link" style="text-decoration:underline;cursor:pointer">Import backup<input id="importFile" type="file" accept="application/json,.json" hidden></label></span>
     <span>Income and bills repeat every month. Savings deposits come out of that month's money.</span>
   </div>
 </div>
+<dialog id="exportDlg" aria-labelledby="exTitle">
+  <form method="dialog" id="exportForm">
+    <h2 id="exTitle">Export</h2>
+    <fieldset><legend class="label">Format</legend><div class="seg">
+      <label><input type="radio" name="fmt" value="json" checked><span>JSON<small>Full backup</small></span></label>
+      <label><input type="radio" name="fmt" value="csv"><span>CSV<small>Excel, Sheets</small></span></label>
+    </div></fieldset>
+    <fieldset id="exSet"><legend class="label">Data</legend><div class="seg">
+      <label><input type="radio" name="set" value="expenses" checked><span>Expenses</span></label>
+      <label><input type="radio" name="set" value="deposits"><span>Savings</span></label>
+      <label><input type="radio" name="set" value="bills"><span>Bills</span></label>
+      <label><input type="radio" name="set" value="income"><span>Income</span></label>
+    </div></fieldset>
+    <fieldset id="exPeriod"><legend class="label">Period</legend><div class="seg">
+      <label><input type="radio" name="period" value="month" checked><span id="exMonth">This month</span></label>
+      <label><input type="radio" name="period" value="all"><span>All time</span></label>
+    </div></fieldset>
+    <p class="muted num" id="exSum" aria-live="polite" style="font-size:.8rem;overflow-wrap:anywhere"></p>
+    <div class="actions"><button class="ghost" value="cancel" formnovalidate>Cancel</button><button class="btn" value="go">Download</button></div>
+  </form>
+</dialog>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -344,7 +400,7 @@ function chart(m) {
 function render() {
   const now = new Date(), nowKey = ym(now), today = now.getDate(), m = month(state, view);
   const [vy, vm] = view.split('-').map(Number);
-  $('monthName').textContent = new Date(vy, vm-1, 1).toLocaleDateString('en-PH', {month: 'long', year: 'numeric'});
+  $('monthName').textContent = new Date(vy, vm-1, 1).toLocaleDateString('en-PH', {month: matchMedia('(max-width:420px)').matches ? 'short' : 'long', year: 'numeric'});
   $('sampleBanner').hidden = !state.sample;
 
   // hero
@@ -498,7 +554,7 @@ function paintTheme() {
   const d = isDark();
   $('theme').textContent = d ? '☀' : '☾';
   $('theme').setAttribute('aria-label', d ? 'Switch to light mode' : 'Switch to dark mode');
-  document.querySelector('meta[name="theme-color"]').content = d ? '#0F1513' : '#0C6B4E';
+  document.querySelector('meta[name="theme-color"]').content = d ? '#111111' : '#fafafa';
 }
 $('theme').onclick = () => {
   const t = isDark() ? 'light' : 'dark';
@@ -507,12 +563,45 @@ $('theme').onclick = () => {
   paintTheme();
 };
 paintTheme();
-$('exportBtn').onclick = () => {
+// ---------- export ----------
+function download(name, text, type) {
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([JSON.stringify(state, null, 2)], {type: 'application/json'}));
-  a.download = `gastador-${ymd(new Date())}.json`;
+  a.href = URL.createObjectURL(new Blob([text], {type}));
+  a.download = name;
   a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+// RFC 4180 quoting; text starting with = + - @ gets a ' so spreadsheets don't run it as a formula
+const cell = v => typeof v === 'number' ? String(v)
+  : (s => /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s)(String(v ?? '').replace(/^[=+\-@\t\r]/, "'$&"));
+const toCsv = rows => '﻿' + rows.map(r => r.map(cell).join(',')).join('\r\n') + '\r\n';
+function csvRows(set, period) {
+  const inP = d => period === 'all' || d.startsWith(view), byDate = (a, b) => a[0].localeCompare(b[0]);
+  if (set === 'bills') return [['name','amount','due_day'], ...state.bills.map(b => [b.name, +b.amount, +b.due])];
+  if (set === 'income') return [['name','amount','pay_day'], ...state.income.map(i => [i.name, +i.amount, +i.day])];
+  if (set === 'deposits') return [['date','goal','amount','goal_target','goal_by'],
+    ...state.goals.flatMap(g => g.deposits.filter(d => inP(d.date)).map(d => [d.date, g.name, +d.amount, +g.target, g.by])).sort(byDate)];
+  return [['date','category','amount','note'], ...state.expenses.filter(e => inP(e.date)).map(e => [e.date, e.cat, +e.amount, e.note || '']).sort(byDate)];
+}
+const exForm = $('exportForm'), exDlg = $('exportDlg');
+function exportChoice() {
+  const {fmt, set, period} = exForm.elements, dated = set.value === 'expenses' || set.value === 'deposits', stamp = ymd(new Date());
+  $('exSet').disabled = fmt.value === 'json';
+  $('exPeriod').disabled = fmt.value === 'json' || !dated;
+  if (fmt.value === 'json') return {name: `gastador-backup-${stamp}.json`, note: 'everything, restorable with Import backup',
+    make: () => [JSON.stringify(state, null, 2), 'application/json']};
+  const rows = csvRows(set.value, period.value), n = rows.length - 1;
+  return {name: `gastador-${set.value}-${!dated ? stamp : period.value === 'month' ? view : 'all-' + stamp}.csv`, note: `${n} row${n === 1 ? '' : 's'}`,
+    make: () => [toCsv(rows), 'text/csv']};
+}
+const paintExport = () => { const c = exportChoice(); $('exSum').textContent = `${c.name} · ${c.note}`; };
+$('exportBtn').onclick = () => { $('exMonth').textContent = $('monthName').textContent; paintExport(); exDlg.showModal(); };
+exForm.onchange = paintExport;
+exForm.onsubmit = e => {
+  if (e.submitter?.value !== 'go') return;
+  const c = exportChoice(); download(c.name, ...c.make()); toast(`Downloaded ${c.name}`);
 };
+exDlg.onclick = e => { if (e.target === exDlg) exDlg.close(); }; // backdrop click; the form fills the box
+exDlg.onclose = () => $('exportBtn').focus();
 $('importFile').onchange = async e => {
   const file = e.target.files[0]; e.target.value = '';
   if (!file) return;
@@ -520,7 +609,7 @@ $('importFile').onchange = async e => {
     const data = JSON.parse(await file.text());
     if (!['income', 'bills', 'expenses', 'goals'].every(k => Array.isArray(data[k]))) throw 0;
     state = {...blank(), ...data}; commit(); toast('Backup restored');
-  } catch { toast('That file isn’t a Gastador backup. Pick a .json file from Export backup.'); }
+  } catch { toast('That file isn’t a Gastador backup. Pick a JSON backup made with Export.'); }
 };
 
 render();
